@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AK Shop – by Adelin Kotrong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#19110b;--mute:#6f6a66;--line:#e6e2dd;--bg:#fff;--soft:#ecebe9;--gold:#c9a86a;--night:#0d1a2b}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Jost,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{display:block;max-width:100%}
+
+/* ===== MONOGRAM PATTERN (original AK motif) ===== */
+.mono-bg{background-color:#5a3e26;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23d9b77a' stroke-width='1.6'%3E%3Cpath d='M14 46 L24 18 L34 46 M18 36 H30'/%3E%3Cpath d='M38 18 V46 M38 33 L50 18 M41 30 L51 46'/%3E%3Cpath d='M74 78 L84 50 L94 78 M78 68 H90' transform='translate(0 0)'/%3E%3Cpath d='M98 50 V78 M98 65 L110 50 M101 62 L111 78'/%3E%3C/g%3E%3Cg fill='%23d9b77a'%3E%3Cpath d='M90 22 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z'/%3E%3Cpath d='M30 82 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z'/%3E%3Crect x='56' y='56' width='8' height='8' transform='rotate(45 60 60)'/%3E%3Crect x='116' y='116' width='8' height='8' transform='rotate(45 120 120)'/%3E%3Crect x='-4' y='-4' width='8' height='8' transform='rotate(45 0 0)'/%3E%3Crect x='116' y='-4' width='8' height='8' transform='rotate(45 120 0)'/%3E%3Crect x='-4' y='116' width='8' height='8' transform='rotate(45 0 120)'/%3E%3C/g%3E%3C/svg%3E");background-size:120px}
+
+/* ===== INTRO LOADER ===== */
+#intro{position:fixed;inset:0;z-index:200;background:#fff;display:grid;place-items:center;transition:opacity .9s ease,visibility .9s}
+#intro.gone{opacity:0;visibility:hidden}
+#intro svg{width:120px}
+#intro path{stroke:var(--ink);stroke-width:2.2;fill:none;stroke-dasharray:300;stroke-dashoffset:300;animation:draw 1.6s cubic-bezier(.65,0,.35,1) forwards}
+#intro path:nth-child(2){animation-delay:.35s}
+#intro .st{fill:var(--gold);transform-origin:60px 60px;transform:scale(0);animation:pop .5s .9s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{to{transform:scale(1)}}
+
+/* ===== HEADER ===== */
+header{position:fixed;top:0;left:0;right:0;z-index:50;height:72px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 40px;color:#fff;transition:background .4s,color .4s,box-shadow .4s}
+header.solid{background:#fff;color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.h-left,.h-right{display:flex;gap:28px;align-items:center;font-size:13px;letter-spacing:.02em}
+.h-right{justify-content:flex-end}
+.burger{display:flex;align-items:center;gap:12px}
+.burger i{display:block;width:18px;height:1px;background:currentColor;position:relative}
+.burger i:before,.burger i:after{content:"";position:absolute;left:0;width:18px;height:1px;background:currentColor}
+.burger i:before{top:-6px}.burger i:after{top:6px}
+.logo{font-family:"Cormorant Garamond",serif;font-size:30px;letter-spacing:.42em;padding-left:.42em;font-weight:500;white-space:nowrap}
+.logo small{display:block;font-family:Jost;font-size:9px;letter-spacing:.5em;text-align:center;margin-top:-4px;opacity:.8}
+.ico{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.3}
+.bag{position:relative}.bag b{position:absolute;top:-6px;right:-9px;font-size:9px;font-weight:500;background:var(--gold);color:#fff;border-radius:50%;width:15px;height:15px;display:grid;place-items:center}
+
+/* ===== MENU ===== */
+#menu{position:fixed;inset:0;z-index:120;pointer-events:none}
+#menu .shade{position:absolute;inset:0;background:rgba(0,0,0,.35);opacity:0;transition:opacity .4s}
+#menu .panel{position:absolute;top:0;left:0;bottom:0;width:min(480px,92vw);background:#fff;transform:translateX(-100%);transition:transform .55s cubic-bezier(.77,0,.18,1);padding:28px 48px;overflow:auto}
+#menu.open{pointer-events:auto}#menu.open .shade{opacity:1}#menu.open .panel{transform:none}
+.panel .close{display:flex;gap:10px;align-items:center;font-size:13px;margin-bottom:48px}
+.panel ul{list-style:none}
+.panel li{font-size:22px;padding:9px 0;opacity:0;transform:translateX(-16px);transition:.5s}
+#menu.open li{opacity:1;transform:none}
+.panel li span{display:block;font-size:12px;color:var(--mute);margin-top:4px;letter-spacing:.02em}
+.panel li a:hover{text-decoration:underline;text-underline-offset:5px}
+.panel .foot{margin-top:40px;border-top:1px solid var(--line);padding-top:24px;font-size:13px;color:var(--mute);display:grid;gap:12px}
+
+/* ===== HERO / CHRISTMAS TRAIN ===== */
+.hero{position:relative;height:100vh;min-height:620px;overflow:hidden;background:linear-gradient(#0a1424 0%,#14294a 45%,#2c4d7a 78%,#8aa6c7 100%);color:#fff}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+.hero .scene{position:absolute;inset:0}
+.moon{position:absolute;top:13%;right:16%;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbe9,#f3e3b6 60%,#d8c18c);box-shadow:0 0 80px 25px rgba(255,240,200,.25)}
+.twinkle{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:tw 3s infinite ease-in-out}
+@keyframes tw{50%{opacity:.15}}
+.hills{position:absolute;left:0;right:0;bottom:0;width:100%}
+.train-wrap{position:absolute;left:0;bottom:34%;width:100%;height:150px;z-index:3}
+.train{position:absolute;bottom:0;left:0;display:flex;align-items:flex-end;gap:6px;animation:ride 26s linear infinite;will-change:transform}
+@keyframes ride{from{transform:translateX(100vw)}to{transform:translateX(-1500px)}}
+.train svg{display:block}
+.wheel{transform-box:fill-box;transform-origin:center;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(-360deg)}}
+.smoke{position:absolute;left:58px;bottom:120px}
+.smoke i{position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.55);filter:blur(3px);animation:puff 2.4s infinite ease-out}
+.smoke i:nth-child(2){animation-delay:.8s}.smoke i:nth-child(3){animation-delay:1.6s}
+@keyframes puff{0%{transform:translate(0,0) scale(.4);opacity:.9}100%{transform:translate(90px,-90px) scale(2.6);opacity:0}}
+.glow{animation:flick 1.8s infinite alternate}
+@keyframes flick{to{opacity:.6}}
+.track{position:absolute;left:0;right:0;bottom:calc(34% - 6px);height:6px;background:repeating-linear-gradient(90deg,#3b2a1d 0 10px,transparent 10px 26px),linear-gradient(#d9d9e0,#d9d9e0);background-size:auto,100% 2px;background-repeat:repeat,no-repeat;background-position:0 2px,0 0;z-index:3;opacity:.85}
+.hero-copy{position:absolute;left:0;right:0;bottom:6%;text-align:center;z-index:6;color:var(--ink)}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:none;margin-bottom:10px}
+.hero h1{font-weight:400;font-size:clamp(34px,4.4vw,60px);letter-spacing:.01em;margin-bottom:22px}
+.ctas{display:flex;gap:28px;justify-content:center;font-size:14px}
+.ctas a{border-bottom:1px solid currentColor;padding-bottom:3px;transition:opacity .3s}.ctas a:hover{opacity:.6}
+
+/* ===== SECTIONS ===== */
+section{padding:80px 40px}
+.s-head{text-align:center;margin-bottom:40px}
+.s-head h2{font-weight:400;font-size:clamp(24px,2.4vw,32px)}
+.s-head p{color:var(--mute);font-size:14px;margin-top:10px}
+.grid8{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{position:relative;overflow:hidden;background:var(--soft);aspect-ratio:3/4}
+.tile .ph,.card .ph{width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.2,.7,.2,1),filter .6s;}
+.tile:hover .ph{transform:scale(1.06)}
+.tile .lab{position:absolute;left:0;right:0;bottom:0;padding:22px 18px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.5))}
+.tile .lab small{font-size:10px;letter-spacing:.16em;display:block;margin-bottom:5px}
+.tile .lab b{font-weight:400;font-size:16px}
+.ph-fallback{position:absolute;inset:0}
+
+/* monogram film band */
+.film{position:relative;height:88vh;min-height:520px;overflow:hidden;display:grid;place-items:center;color:var(--ink);background:#ecebe9;text-align:center;padding:0}
+.film .mono-bg{position:absolute;inset:-120px;animation:drift 40s linear infinite}
+@keyframes drift{to{transform:translate(120px,120px)}}
+
+.film .in{position:relative;z-index:2}
+.film svg.big{width:min(300px,50vw);margin:0 auto;}
+.film svg.big path{stroke:var(--ink);stroke-width:1.6;fill:none;stroke-dasharray:420;stroke-dashoffset:420}
+.film.on svg.big path{animation:draw 2.4s cubic-bezier(.65,0,.35,1) forwards}
+.film.on svg.big path:nth-child(2){animation-delay:.4s}
+.film.on svg.big .ring{animation-delay:.8s}
+.film h2{font-weight:400;font-size:clamp(28px,3.4vw,46px);margin-bottom:12px}
+.film p{font-size:14px;opacity:.85;margin-bottom:22px}
+
+/* product rails */
+.rail-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;gap:20px}
+.rail-head small{font-size:12px;color:var(--mute);display:block;margin-bottom:6px}
+.rail-head h2{font-weight:400;font-size:clamp(22px,2.2vw,30px)}
+.rail-head a{font-size:14px;border-bottom:1px solid;padding-bottom:3px;white-space:nowrap}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.card{position:relative}
+.card .img{position:relative;aspect-ratio:4/5;background:var(--soft);overflow:hidden}
+.card:hover .ph{transform:scale(1.05)}
+.card .wish{position:absolute;top:14px;right:14px;z-index:2;width:20px;height:20px}
+.card .wish svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:1.2;transition:fill .3s}
+.card .wish.on svg{fill:var(--ink)}
+.card .tag{position:absolute;top:14px;left:14px;z-index:2;font-size:11px;background:rgba(255,255,255,.9);padding:3px 8px}
+.card .meta{padding:14px 2px 6px;font-size:14px;display:flex;justify-content:space-between;gap:10px}
+.card .meta span{color:var(--mute);white-space:nowrap}
+.card .add{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;background:#fff;padding:12px;font-size:13px;text-align:center;opacity:0;transform:translateY(8px);transition:.35s}
+.card:hover .add{opacity:1;transform:none}
+.alt{background:var(--soft)}
+
+/* split hero */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 40px 80px}
+.split .tile{aspect-ratio:4/5}
+.split .lab{padding:36px 30px}.split .lab b{font-size:26px}
+
+/* maison */
+.maison p.lead{max-width:720px;margin:0 auto 46px;text-align:center;color:var(--mute);font-size:15px;line-height:1.75}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid3 .tile{aspect-ratio:4/5}
+.grid3 h3{font-weight:400;font-size:18px;margin:16px 0 6px}
+.grid3 a.l{font-size:13px;border-bottom:1px solid;padding-bottom:2px}
+
+/* newsletter + footer */
+.news{text-align:center;border-top:1px solid var(--line)}
+.news form{display:flex;max-width:460px;margin:22px auto 0;border-bottom:1px solid var(--ink)}
+.news input{flex:1;border:0;outline:0;font:inherit;font-size:14px;padding:12px 0;background:none}
+.news .ok{font-size:13px;color:var(--mute);margin-top:12px;min-height:18px}
+footer{border-top:1px solid var(--line);padding:56px 40px 30px;font-size:13px}
+.fcols{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;margin-bottom:46px}
+.fcols h4{font-weight:500;font-size:13px;margin-bottom:16px}
+.fcols a{display:block;color:var(--mute);margin-bottom:10px}.fcols a:hover{color:var(--ink)}
+.fbot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:24px;color:var(--mute);flex-wrap:wrap;gap:12px}
+.fbot .logo{color:var(--ink);font-size:22px}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(30px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* cart drawer toast */
+#toast{position:fixed;right:24px;bottom:24px;z-index:150;background:var(--ink);color:#fff;padding:16px 22px;font-size:13px;transform:translateY(140%);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+#toast.show{transform:none}
+
+@media(max-width:900px){
+ header{padding:0 18px}.h-left .txt,.h-right .txt{display:none}.logo{font-size:22px}
+ section{padding:56px 16px}.grid8,.grid4{grid-template-columns:repeat(2,1fr)}
+ .split{grid-template-columns:1fr;padding:0 16px 56px}.grid3{grid-template-columns:1fr}
+ .fcols{grid-template-columns:repeat(2,1fr)}footer{padding:40px 16px 24px}
+ .train{transform-origin:left bottom}.train-wrap{transform:scale(.62);transform-origin:left bottom}
+ .card .add{opacity:1;transform:none;font-size:12px;padding:9px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- INTRO: AK monogram drawing -->
+<div id="intro" aria-hidden="true">
+ <svg viewBox="0 0 120 120"><path d="M18 92 L40 28 L62 92 M27 68 H53"/><path d="M70 28 V92 M70 62 L102 28 M77 55 L104 92"/><path class="st" d="M60 4 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z"/></svg>
+</div>
+
+<header id="hdr">
+ <div class="h-left">
+  <button class="burger" id="openMenu" aria-label="Meniu"><i></i><span class="txt">Meniu</span></button>
+  <button aria-label="Caută" style="display:flex;gap:10px;align-items:center"><svg class="ico" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="txt">Caută</span></button>
+ </div>
+ <a href="#top" class="logo">AK SHOP<small>ADELIN KOTRONG</small></a>
+ <div class="h-right">
+  <a href="#contact" class="txt">Contact</a>
+  <a href="#" aria-label="Favorite"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></a>
+  <a href="#" aria-label="Cont"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></a>
+  <a href="#" class="bag" aria-label="Coș"><svg class="ico" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><b id="cartN">0</b></a>
+ </div>
+</header>
+
+<div id="menu">
+ <div class="shade" data-close></div>
+ <nav class="panel">
+  <button class="close" data-close>✕ <span>Închide</span></button>
+  <ul>
+   <li><a href="#cadouri">Cadouri de Sărbători</a></li>
+   <li><a href="#denim">Blugi &amp; Denim<span>Blugi · Pantaloni lungi · Pantaloni scurți</span></a></li>
+   <li><a href="#categorii">Jachete &amp; Veste</a></li>
+   <li><a href="#categorii">Hanorace<span>Hanorac · Hanorac cu fermoar</span></a></li>
+   <li><a href="#categorii">Tricouri &amp; Cămăși</a></li>
+   <li><a href="#categorii">Treninguri<span>Bărbați · Femei</span></a></li>
+   <li><a href="#elegance">Elegance</a></li>
+   <li><a href="#luxury">Luxury<span>Hand Bag · Cardholder · Malete</span></a></li>
+   <li><a href="#categorii">Încălțăminte</a></li>
+   <li><a href="#categorii">Accesorii<span>Șepci · Șosete · Ochelari de soare · Lenjerie</span></a></li>
+   <li><a href="#maison">AK Highlighted</a></li>
+  </ul>
+  <div class="foot"><a href="#contact">Livrare &amp; Retur</a><a href="#contact">Plată securizată Netopia</a><a href="#contact">Termeni și condiții</a></div>
+ </nav>
+</div>
+
+<main id="top">
+
+<!-- HERO: Christmas journey with the AK train -->
+<section class="hero" style="padding:0">
+ <div class="scene" id="sky">
+  <div class="moon"></div>
+ </div>
+ <svg class="hills" viewBox="0 0 1440 360" preserveAspectRatio="none" style="height:42%">
+  <path fill="#c9d6e6" d="M0 140 C200 80 360 150 560 110 S900 40 1100 100 1360 90 1440 70 V360 H0z" opacity=".55"/>
+  <g fill="#1d3352" opacity=".9">
+   <path d="M120 120 l22 -60 22 60z M150 125 l18 -48 18 48z M980 100 l26 -70 26 70z M1015 105 l20 -52 20 52z M1240 92 l24 -62 24 62z"/>
+  </g>
+  <g fill="#ffd98a" class="glow"><rect x="640" y="78" width="6" height="7"/><rect x="654" y="78" width="6" height="7"/><rect x="760" y="70" width="5" height="6"/><rect x="300" y="96" width="5" height="6"/><rect x="1180" y="80" width="6" height="7"/></g>
+  <g fill="#24395a"><path d="M630 90 h40 v-14 l-20 -14 -20 14z"/><path d="M750 80 h28 v-10 l-14 -10 -14 10z"/><path d="M290 104 h26 v-10 l-13 -9 -13 9z"/><path d="M1170 92 h34 v-12 l-17 -12 -17 12z"/></g>
+  <path fill="#eef3f9" d="M0 230 C240 190 480 240 720 215 S1200 180 1440 210 V360 H0z"/>
+  <path fill="#ffffff" d="M0 280 C300 255 600 290 900 270 S1300 255 1440 265 V360 H0z"/>
+ </svg>
+ <div class="track"></div>
+ <div class="train-wrap">
+  <div class="train" id="train">
+   <!-- locomotive -->
+   <div style="position:relative">
+    <div class="smoke"><i></i><i></i><i></i></div>
+    <svg width="230" height="140" viewBox="0 0 230 140">
+     <defs>
+      <pattern id="mg" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#5a3e26"/><text x="3" y="17" font-family="Cormorant Garamond,serif" font-size="12" fill="#d9b77a" letter-spacing="-1">AK</text><path d="M20 2 l1.2 2.8 2.8 1.2 -2.8 1.2 -1.2 2.8 -1.2 -2.8 -2.8 -1.2 2.8 -1.2z" fill="#d9b77a"/></pattern>
+     </defs>
+     <rect x="58" y="18" width="18" height="34" fill="#19110b"/><rect x="52" y="12" width="30" height="8" rx="2" fill="#c9a86a"/>
+     <rect x="20" y="50" width="130" height="52" rx="10" fill="#7a1f24"/>
+     <rect x="20" y="70" width="130" height="5" fill="#c9a86a"/>
+     <circle cx="20" cy="72" r="9" fill="#ffe7a8" class="glow"/><path d="M12 72 L-80 52 L-80 92z" fill="rgba(255,231,168,.18)"/>
+     <rect x="140" y="26" width="72" height="76" rx="6" fill="#19110b"/>
+     <rect x="152" y="38" width="22" height="22" rx="3" fill="#ffd98a" class="glow"/><rect x="180" y="38" width="22" height="22" rx="3" fill="#ffd98a" class="glow"/>
+     <rect x="134" y="20" width="84" height="10" rx="3" fill="#7a1f24"/>
+     <text x="176" y="88" font-family="Cormorant Garamond,serif" font-size="18" fill="#c9a86a" text-anchor="middle" letter-spacing="2">AK</text>
+     <path d="M6 104 L20 90 V104z" fill="#19110b"/>
+     <g fill="#19110b" stroke="#c9a86a" stroke-width="2"><circle class="wheel" cx="45" cy="112" r="16"/><circle class="wheel" cx="95" cy="112" r="16"/><circle class="wheel" cx="175" cy="114" r="14"/></g>
+     <g stroke="#c9a86a" stroke-width="2"><path class="wheel" d="M45 98 V126 M31 112 H59"/><path class="wheel" d="M95 98 V126 M81 112 H109"/></g>
+     <rect x="40" y="108" width="62" height="5" rx="2" fill="#c9a86a"/>
+    </svg>
+   </div>
+   <!-- trunk wagon -->
+   <svg width="190" height="140" viewBox="0 0 190 140">
+    <rect x="10" y="96" width="170" height="10" fill="#19110b"/>
+    <rect x="18" y="30" width="154" height="66" rx="4" fill="url(#mg)" stroke="#3a2614" stroke-width="3"/>
+    <rect x="18" y="30" width="154" height="8" fill="#3a2614"/><rect x="18" y="88" width="154" height="8" fill="#3a2614"/>
+    <rect x="58" y="30" width="6" height="66" fill="#3a2614"/><rect x="126" y="30" width="6" height="66" fill="#3a2614"/>
+    <rect x="88" y="54" width="14" height="16" rx="2" fill="#c9a86a"/>
+    <path d="M90 26 q5 -14 10 0" stroke="#c9a86a" stroke-width="3" fill="none"/>
+    <g fill="#19110b" stroke="#c9a86a" stroke-width="2"><circle class="wheel" cx="45" cy="114" r="13"/><circle class="wheel" cx="145" cy="114" r="13"/></g>
+   </svg>
+   <!-- gifts flatcar -->
+   <svg width="190" height="140" viewBox="0 0 190 140">
+    <rect x="10" y="96" width="170" height="10" fill="#19110b"/>
+    <rect x="22" y="50" width="52" height="46" fill="#7a1f24"/><rect x="44" y="50" width="8" height="46" fill="#c9a86a"/><path d="M48 50 q-14 -18 -2 -16 q6 2 2 16 q4 -14 10 -16 q12 -2 -10 16" fill="none" stroke="#c9a86a" stroke-width="3"/>
+    <rect x="80" y="30" width="44" height="66" fill="#f4efe6"/><rect x="98" y="30" width="8" height="66" fill="#19110b"/><text x="102" y="72" font-family="Cormorant Garamond,serif" font-size="11" fill="#c9a86a" text-anchor="middle">AK</text>
+    <rect x="130" y="58" width="40" height="38" fill="url(#mg)"/><rect x="130" y="72" width="40" height="7" fill="#c9a86a"/>
+    <g fill="#19110b" stroke="#c9a86a" stroke-width="2"><circle class="wheel" cx="45" cy="114" r="13"/><circle class="wheel" cx="145" cy="114" r="13"/></g>
+   </svg>
+   <!-- tree wagon -->
+   <svg width="190" height="140" viewBox="0 0 190 140">
+    <rect x="10" y="96" width="170" height="10" fill="#19110b"/>
+    <path d="M95 10 L135 66 H118 L145 96 H45 L72 66 H55z" fill="#1f4a35"/>
+    <path d="M95 2 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#ffd98a" class="glow"/>
+    <g fill="#ffd98a" class="glow"><circle cx="82" cy="54" r="3"/><circle cx="108" cy="62" r="3"/><circle cx="74" cy="84" r="3"/><circle cx="118" cy="86" r="3"/><circle cx="96" cy="78" r="3"/></g>
+    <g fill="#c9a86a"><circle cx="100" cy="40" r="3"/><circle cx="88" cy="72" r="3"/><circle cx="128" cy="90" r="3"/></g>
+    <g fill="#19110b" stroke="#c9a86a" stroke-width="2"><circle class="wheel" cx="45" cy="114" r="13"/><circle class="wheel" cx="145" cy="114" r="13"/></g>
+   </svg>
+   <!-- second trunk wagon -->
+   <svg width="190" height="140" viewBox="0 0 190 140">
+    <rect x="10" y="96" width="170" height="10" fill="#19110b"/>
+    <rect x="18" y="40" width="154" height="56" rx="4" fill="#7a1f24" stroke="#3a2614" stroke-width="3"/>
+    <g fill="#ffd98a" class="glow"><rect x="30" y="52" width="26" height="22" rx="3"/><rect x="66" y="52" width="26" height="22" rx="3"/><rect x="102" y="52" width="26" height="22" rx="3"/><rect x="138" y="52" width="24" height="22" rx="3"/></g>
+    <rect x="12" y="32" width="166" height="10" rx="4" fill="#19110b"/>
+    <text x="95" y="90" font-family="Jost,sans-serif" font-size="8" fill="#c9a86a" text-anchor="middle" letter-spacing="3">AK HOLIDAY EXPRESS</text>
+    <g fill="#19110b" stroke="#c9a86a" stroke-width="2"><circle class="wheel" cx="45" cy="114" r="13"/><circle class="wheel" cx="145" cy="114" r="13"/></g>
+   </svg>
+  </div>
+ </div>
+ <canvas id="snow"></canvas>
+ <div class="hero-copy">
+  <div class="eyebrow">Cadouri</div>
+  <h1>O Călătorie de Sărbători</h1>
+  <div class="ctas"><a href="#cadouri">Cadouri pentru Ea</a><a href="#cadouri">Cadouri pentru El</a></div>
+ </div>
+</section>
+
+<!-- HOLIDAY TILES -->
+<section id="cadouri">
+ <div class="s-head rv"><h2>Descoperă o selecție de creații AK</h2><p>Piese făcute să fie oferite. Livrare înainte de Crăciun.</p></div>
+ <div class="grid8" id="tiles"></div>
+</section>
+
+<!-- MONOGRAM FILM -->
+<section class="film" id="film">
+ <div class="in rv">
+  <svg class="big" viewBox="0 0 160 160"><path d="M30 122 L58 40 L86 122 M41 92 H75"/><path d="M96 40 V122 M96 82 L134 40 M104 74 L136 122"/><path class="ring" d="M80 6 a74 74 0 1 1 -0.1 0z"/></svg>
+ </div>
+</section>
+
+<!-- RAILS -->
+<section id="denim">
+ <div class="rail-head rv"><div><small>Bărbați &amp; Femei</small><h2>Denim Signature</h2></div><a href="#denim">Descoperă blugii</a></div>
+ <div class="grid4" data-rail="denim"></div>
+</section>
+
+<div class="split">
+ <a class="tile rv" href="#elegance" data-img="20"><div class="lab"><small>COLECȚIA DIN IN</small><b>Elegance</b></div></a>
+ <a class="tile rv" href="#luxury" data-img="22"><div class="lab"><small>LUXURY</small><b>Fringe Denim Bag</b></div></a>
+</div>
+
+<section id="elegance" class="alt">
+ <div class="rail-head rv"><div><small>Elegance</small><h2>Seturi din in</h2></div><a href="#elegance">Descoperă creațiile</a></div>
+ <div class="grid4" data-rail="elegance"></div>
+</section>
+
+<section id="luxury">
+ <div class="rail-head rv"><div><small>Luxury</small><h2>Genți &amp; Accesorii</h2></div><a href="#luxury">Descoperă genți</a></div>
+ <div class="grid4" data-rail="luxury"></div>
+</section>
+
+<section id="street" class="alt">
+ <div class="rail-head rv"><div><small>Streetwear</small><h2>Highlighted Street</h2></div><a href="#street">Descoperă tot</a></div>
+ <div class="grid4" data-rail="street"></div>
+</section>
+
+<!-- MAISON -->
+<section class="maison" id="maison">
+ <div class="s-head rv"><h2>AK Highlighted</h2></div>
+ <p class="lead rv">Creat de Adelin Kotrong, AK Shop transformă denimul, inul și detaliile metalice în piese de autor. Fiecare colecție pornește dintr-o idee simplă: haine care se văd — highlighted.</p>
+ <div class="grid3">
+  <div class="rv"><a class="tile" href="#" data-img="6"></a><h3>First Collection</h3><a class="l" href="#">Descoperă povestea</a></div>
+  <div class="rv"><a class="tile" href="#" data-img="2"></a><h3>Safari</h3><a class="l" href="#">Vezi campania</a></div>
+  <div class="rv"><a class="tile" href="#" data-img="9"></a><h3>Glow</h3><a class="l" href="#">Explorează</a></div>
+ </div>
+</section>
+
+<section class="news" id="contact">
+ <div class="s-head rv" style="margin-bottom:0"><h2>Abonează-te la newsletter</h2><p>Lansări, colecții noi și invitații private.</p></div>
+ <form id="nl"><input type="email" required placeholder="Adresa de e-mail"><button>Abonează-te →</button></form>
+ <div class="ok" id="nlok"></div>
+</section>
+</main>
+
+<footer>
+ <div class="fcols">
+  <div><h4>Ajutor</h4><a href="#">Livrare</a><a href="#">Plată</a><a href="#">Retur</a><a href="#">Ghid mărimi</a></div>
+  <div><h4>Colecții</h4><a href="#denim">Denim</a><a href="#elegance">Elegance</a><a href="#luxury">Luxury</a><a href="#street">Streetwear</a></div>
+  <div><h4>Despre</h4><a href="#maison">AK Highlighted</a><a href="#">Termeni și condiții</a><a href="#">Politica cookies</a><a href="#">ANPC · SOL</a></div>
+  <div><h4>Urmărește-ne</h4><a href="https://instagram.com/ak_highlighted">Instagram @ak_highlighted</a><a href="https://tiktok.com/@adelin_kotrong">TikTok @adelin_kotrong</a></div>
+ </div>
+ <div class="fbot"><span class="logo">AK SHOP</span><span>© 2026 AK Shop – by Adelin Kotrong · România (RON)</span></div>
+</footer>
+
+<div id="toast">Adăugat în coș ✓</div>
+
+<script>
+// ---------- data ----------
+const P={
+ 1:["Jacheta din denim cu blană",450],2:["Jacheta Safari",400],3:["Pantalonii Safari",400],4:["Blugii Fringe Square",400],5:["Blugi Pocket Print",430],
+ 6:["Treningul First Collection",550],7:["Pantaloni full black cu ținte",320],8:["Hanorac full black cu ținte",320],9:["GlowCap",190],10:["Blue Glow Cap",190],
+ 11:["Blugii Stars",430],12:["Blugii Palm",380],13:["Maleta Dolce Vita",230],14:["Blugii de femei Stars",390],15:["StarZip Hoodie",350],
+ 16:["Tricou accesorizat cu ținte",180],17:["Tricoul Highlighted albastru",180],18:["Ochelarii de Soare Hexa Sky",380],19:["Cămașa Striped",300],
+ 20:["Setul de in Salvia",550],21:["Pantaloni scurți striped jeans",310],22:["Fringe Denim Bag",480],23:["Indigo Bag",480],24:["Tricoul Highlighted portocaliu",180],
+ 25:["Pantaloni scurți Fringe Denim",310],26:["Cămașa Fringe Denim",310],27:["Setul de In Palma",550],28:["Pantaloni scurți Stars Denim",300],
+ 29:["Tricou tricolor cu guler",200],32:["Cămașa Stars Denim",300],34:["Încălțăminte Black Square Denim",550],35:["Cămașă Denim Indigo",300],
+ 40:["Pantaloni scurți cu detaliu din plasă",200],41:["Maiou din material tip plasă",180]
+};
+const src=id=>"img/p"+id+".jpg";
+const RAILS={denim:[1,4,5,11,14,12,25,28],elegance:[20,27,19,2,3,35,32,26],luxury:[22,23,34,18,9,10,13,15],street:[6,7,8,16,17,24,29,41]};
+const TILES=[[1,"Jachete"],[11,"Blugi"],[15,"Hanorace"],[20,"Elegance"],[22,"Hand Bag"],[13,"Malete"],[34,"Încălțăminte"],[18,"Accesorii"]];
+const NEW=new Set([1,2,3,4,5]);
+const img=(id,alt)=>`<div class="ph-fallback mono-bg"></div><img class="ph" loading="lazy" src="${src(id)}" alt="${alt||""}" onerror="this.remove()" style="position:relative">`;
+
+document.getElementById("tiles").innerHTML=TILES.map(([id,n])=>`<a class="tile rv" href="#">${img(id,n)}<div class="lab"><small>SĂRBĂTORI</small><b>${n}</b></div></a>`).join("");
+document.querySelectorAll("[data-img]").forEach(t=>t.insertAdjacentHTML("afterbegin",img(t.dataset.img)));
+document.querySelectorAll("[data-rail]").forEach(r=>{
+ r.innerHTML=RAILS[r.dataset.rail].map(id=>`<div class="card rv"><div class="img">${NEW.has(id)?'<span class="tag">Nou</span>':''}<button class="wish" aria-label="Favorite"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>${img(id,P[id][0])}<button class="add">Adaugă în coș</button></div><div class="meta">${P[id][0]}<span>${P[id][1]} lei</span></div></div>`).join("");
+});
+
+// ---------- interactions ----------
+let n=0;const toast=document.getElementById("toast");
+document.addEventListener("click",e=>{
+ const w=e.target.closest(".wish");if(w){w.classList.toggle("on");return}
+ const a=e.target.closest(".add");if(a){document.getElementById("cartN").textContent=++n;toast.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>toast.classList.remove("show"),1800)}
+});
+const menu=document.getElementById("menu");
+document.getElementById("openMenu").onclick=()=>menu.classList.add("open");
+menu.addEventListener("click",e=>{if(e.target.closest("[data-close]")||e.target.closest(".panel a"))menu.classList.remove("open")});
+document.querySelectorAll(".panel li").forEach((li,i)=>li.style.transitionDelay=(.08+i*.04)+"s");
+document.getElementById("nl").onsubmit=e=>{e.preventDefault();document.getElementById("nlok").textContent="Mulțumim! Te-ai abonat.";e.target.reset()};
+
+const hdr=document.getElementById("hdr");
+const onScroll=()=>hdr.classList.toggle("solid",scrollY>innerHeight*.75);
+addEventListener("scroll",onScroll,{passive:true});onScroll();
+
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.15});
+document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+const film=document.getElementById("film");
+new IntersectionObserver(es=>es.forEach(x=>x.isIntersecting&&film.classList.add("on")),{threshold:.35}).observe(film);
+
+// intro
+addEventListener("load",()=>setTimeout(()=>document.getElementById("intro").classList.add("gone"),1700));
+setTimeout(()=>document.getElementById("intro").classList.add("gone"),3500);
+
+// stars
+const sky=document.getElementById("sky");
+for(let i=0;i<70;i++){const s=document.createElement("i");s.className="twinkle";s.style.left=Math.random()*100+"%";s.style.top=Math.random()*55+"%";s.style.animationDelay=Math.random()*3+"s";s.style.opacity=.4+Math.random()*.6;sky.appendChild(s)}
+
+// snow
+const c=document.getElementById("snow"),x=c.getContext("2d");let W,H,flakes=[];
+function size(){W=c.width=c.offsetWidth*devicePixelRatio;H=c.height=c.offsetHeight*devicePixelRatio}
+size();addEventListener("resize",size);
+for(let i=0;i<180;i++)flakes.push({x:Math.random(),y:Math.random(),r:.6+Math.random()*2.4,s:.0006+Math.random()*.0016,d:Math.random()*6});
+(function loop(t){x.clearRect(0,0,W,H);x.fillStyle="rgba(255,255,255,.9)";
+ for(const f of flakes){f.y+=f.s;if(f.y>1){f.y=-.02;f.x=Math.random()}
+  const px=(f.x+Math.sin(t/2000+f.d)*.01)*W,py=f.y*H;x.globalAlpha=.35+f.r/4;x.beginPath();x.arc(px,py,f.r*devicePixelRatio,0,7);x.fill()}
+ requestAnimationFrame(loop)})(0);
+</script>
+</body>
+</html>
